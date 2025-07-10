@@ -492,3 +492,8 @@ OUTPUT:
 <img width="558" height="393" alt="image" src="https://github.com/user-attachments/assets/555dd503-1452-44d5-9603-5a5173cb45dc" />
 <img width="790" height="590" alt="image" src="https://github.com/user-attachments/assets/50c00076-caaf-47a7-8399-77477c1d5126" />
 
+
+# TASK-3Implement a support vector machine (SVM) to classify images of cats and dogs from the Kaggle dataset.
+
+
+
