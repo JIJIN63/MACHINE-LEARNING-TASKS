@@ -423,5 +423,72 @@ New Model R²       : 0.813
 
 
 
+# TASK-2 Create a K-means clustering algorithm to group customers of a retail store based on their purchase history.
 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+import io
+csv_data = """CustomerID,Gender,Age,Annual Income (k$),Spending Score (1-100)
+1,Male,19,15,39
+2,Male,21,15,81
+3,Female,20,16,6
+4,Female,23,16,77
+5,Female,31,17,40
+6,Female,22,17,76
+7,Female,35,18,6
+8,Female,23,18,94
+9,Male,64,19,3
+10,Female,30,19,72
+"""
+df = pd.read_csv(io.StringIO(csv_data))
+print(df.head())
+X = df[['Annual Income (k$)', 'Spending Score (1-100)']]
+
+inertia = []
+K = range(1, 11)
+for k in K:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10) # Added n_init
+    kmeans.fit(X)
+    inertia.append(kmeans.inertia_)
+plt.figure(figsize=(6,4))
+plt.plot(K, inertia, marker='o')
+plt.xlabel('Number of clusters (k)')
+plt.ylabel('Inertia (Within-cluster sum of squares)')
+plt.title('Elbow Method for Optimal k')
+plt.grid(True)
+plt.show()
+
+optimal_k = 3 # Adjusted optimal_k based on the small sample data
+kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10) # Added n_init
+df['Cluster'] = kmeans.fit_predict(X)
+plt.figure(figsize=(8,6))
+colors = ['red', 'blue', 'green', 'cyan', 'magenta']
+
+for i in range(optimal_k):
+    plt.scatter(X[df['Cluster'] == i]['Annual Income (k$)'],
+                X[df['Cluster'] == i]['Spending Score (1-100)'],
+                label=f'Cluster {i+1}',
+                c=colors[i],
+                edgecolor='black')
+centroids = kmeans.cluster_centers_
+plt.scatter(centroids[:, 0], centroids[:, 1],
+            s=300, c='yellow', marker='*', label='Centroids')
+plt.xlabel('Annual Income (k$)')
+plt.ylabel('Spending Score (1-100)')
+plt.title('Customer Segmentation using K-Means')
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+OUTPUT:
+ CustomerID    Gender  Age  Annual Income (k$)  Spending Score (1-100)
+0           1    Male   19                  15                      39
+1           2    Male   21                  15                      81
+2           3  Female   20                  16                       6
+3           4  Female   23                  16                      77
+4           5  Female   31                  17                      40
+<img width="558" height="393" alt="image" src="https://github.com/user-attachments/assets/555dd503-1452-44d5-9603-5a5173cb45dc" />
+<img width="790" height="590" alt="image" src="https://github.com/user-attachments/assets/50c00076-caaf-47a7-8399-77477c1d5126" />
 
