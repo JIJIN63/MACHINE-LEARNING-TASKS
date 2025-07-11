@@ -495,5 +495,137 @@ OUTPUT:
 
 # TASK-3Implement a support vector machine (SVM) to classify images of cats and dogs from the Kaggle dataset.
 
+import matplotlib.pyplot as plt
+import tensorflow as tf
+import pandas as pd
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+from tensorflow import keras
+from keras import layers
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Activation, Dropout, Flatten, Dense
+from tensorflow.keras.layers import Conv2D, MaxPooling2D
+from tensorflow.keras.utils import image_dataset_from_directory
+from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img
+from tensorflow.keras.preprocessing import image_dataset_from_directory
+import os
+import matplotlib.image as mpimg 
+from zipfile import ZipFile
+data_path = 'dog-vs-cat.zip'
+with ZipFile(data_path, 'r') as zip:
+    zip.extractall()
+    print('The data set has been extracted.')
+    fig = plt.gcf()
+fig.set_size_inches(16, 16)
+cat_dir = os.path.join('dog-vs-cat-classification/cat')
+dog_dir = os.path.join('dog-vs-cat-classification/dog')
+cat_names = os.listdir(cat_dir)
+dog_names = os.listdir(dog_dir)
+pic_index = 210
+cat_images = [os.path.join(cat_dir, fname)
+              for fname in cat_names[pic_index-8:pic_index]]
+dog_images = [os.path.join(dog_dir, fname)
+              for fname in dog_names[pic_index-8:pic_index]]
+for i, img_path in enumerate(cat_images + dog_images):
+    sp = plt.subplot(4, 4, i+1)
+    sp.axis('Off')
 
+    img = mpimg.imread(img_path)
+    plt.imshow(img)
+plt.show()
 
+OUTPUT:
+<img width="386" height="346" alt="image" src="https://github.com/user-attachments/assets/bcb9084f-78de-4bfa-b9f2-51fe93e14748" />
+
+# Splitting Dataset
+
+base_dir = 'dog-vs-cat-classification'
+train_datagen = image_dataset_from_directory(base_dir,
+                                                  image_size=(200,200),
+                                                  subset='training',
+                                                  seed = 1,
+                                                 validation_split=0.1,
+                                                  batch_size= 32)
+test_datagen = image_dataset_from_directory(base_dir,
+                                                  image_size=(200,200),
+                                                  subset='validation',
+                                                  seed = 1,
+                                                 validation_split=0.1,
+                                                  batch_size= 32)
+Output : 
+
+Found 25000 files belonging to 2 classes.
+Using 22500 files for training.
+Found 25000 files belonging to 2 classes.
+Using 2500 files for validation.
+
+# Model Architecture
+model = tf.keras.models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(200, 200, 3)),
+    layers.MaxPooling2D(2, 2),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D(2, 2),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D(2, 2),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D(2, 2),
+
+    layers.Flatten(),
+    layers.Dense(512, activation='relu'),
+    layers.BatchNormalization(),
+    layers.Dense(512, activation='relu'),
+    layers.Dropout(0.1),
+    layers.BatchNormalization(),
+    layers.Dense(512, activation='relu'),
+    layers.Dropout(0.2),
+    layers.BatchNormalization(),
+    layers.Dense(1, activation='sigmoid')
+])
+model.summary()
+Output :
+
+Cat and Dog Classifier using Tensorflow
+<img width="350" height="543" alt="image" src="https://github.com/user-attachments/assets/e64f5d81-ff95-4e7d-890c-ba1026f8182d" />
+
+# Model Compilation and Training
+model.compile(
+    loss='binary_crossentropy',
+    optimizer='adam',
+    metrics=['accuracy']
+)
+history = model.fit(train_datagen,
+          epochs=10,
+          validation_data=test_datagen)
+	  
+Output :
+
+<img width="962" height="261" alt="image" src="https://github.com/user-attachments/assets/efc564c8-9329-44b5-97fe-a8eb419336e0" />
+
+Cat and Dog Classifier using Tensorflow
+
+# Model Evaluation
+history_df = pd.DataFrame(history.history)
+history_df.loc[:, ['loss', 'val_loss']].plot()
+history_df.loc[:, ['accuracy', 'val_accuracy']].plot()
+plt.show()
+Output : 
+<img width="510" height="456" alt="image" src="https://github.com/user-attachments/assets/8fd8e9eb-15f8-4595-84b4-e4900d004cee" />
+<img width="510" height="456" alt="image" src="https://github.com/user-attachments/assets/46d05119-5797-4129-a94a-54b8190a7b19" />
+
+# Model Testing and Prediction
+def predict_image(image_path):
+    img = image.load_img(image_path, target_size=(200, 200))
+    plt.imshow(img)
+    img = image.img_to_array(img)
+    img = np.expand_dims(img, axis=0)
+
+    result = model.predict(img)
+    print("Dog" if result >= 0.5 else "Cat")
+    
+predict_image('dog-vs-cat-classification/cat/cat.320.jpg')
+predict_image('dog-vs-cat-classification/dog/dog.5510.jpg')
+
+Output:
+<img width="271" height="251" alt="image" src="https://github.com/user-attachments/assets/9a5d5240-3a8f-4fb1-a4ef-401ad4d099f0" />
+<img width="257" height="257" alt="image" src="https://github.com/user-attachments/assets/be9cfc6c-2d0d-463f-8ab4-007be183e6ea" />
