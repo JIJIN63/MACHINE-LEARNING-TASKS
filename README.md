@@ -730,6 +730,7 @@ model.compile(optimizer='adam',
     validation_data=val_ds
 )
 output:
+
 Epoch 1/5
 3/3 ━━━━━━━━━━━━━━━━━━━━ 13s 3s/step - accuracy: 0.4250 - loss: 1.4878 - val_accuracy: 1.0000 - val_loss: 0.0000e+00
 Epoch 2/5
@@ -748,6 +749,7 @@ print(f"Loss: {evaluation_results[0]:.4f}")
 print(f"Accuracy: {evaluation_results[1]:.4f}")
 
 output:
+
 1/1 ━━━━━━━━━━━━━━━━━━━━ 2s 2s/step - accuracy: 1.0000 - loss: 0.0000e+00
 Evaluation Results:
 Loss: 0.0000
